@@ -1,7 +1,7 @@
 # Mini_Projet_C
 
 Le but de ce projet est de créer un jeu à l'aide de raylib. Ce jeu comporte plusieurs points communs avec Geometry Dash ( https://fr.wikipedia.org/wiki/Geometry_Dash)
-Il s'agit d'un jeu 2D où un carré avance (sans arret) de gauche à droite et le but est de sauté au bon moments afin d'éviter les différents obstacles.
+Il s'agit d'un jeu 2D où un carré avance (sans arrêt) de gauche à droite et le but est de sauter au bon moment afin d'éviter les différents obstacles.
 
 Commande: 
 
