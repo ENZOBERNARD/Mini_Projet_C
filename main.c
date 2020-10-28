@@ -2,6 +2,7 @@
 
    typedef struct Player {
     Vector2 position;
+    int taille;
     float speed;
     bool canJump;
     int jumpState;
@@ -10,6 +11,7 @@
     
     typedef struct Obstacle {
     Vector2 position;
+    Vector2 taille;
     float speed;
     } Obstacle;
    
@@ -26,11 +28,14 @@ int main(void)
     Player player;
     Obstacle obstacle;
     player.position = (Vector2){(float)100, (float)320};
-    obstacle.position= (Vector2){(float)700, (float)270};
-    obstacle.speed=1;
+    player.taille=30;
+    obstacle.position= (Vector2){(float)155, (float)270};
+    obstacle.taille= (Vector2){(float)50, (float)80};
+    obstacle.speed=0.2;
     bool pause=true;
     player.jumpState=0;
     player.jumpFrame=0;
+    int colisionOrNot=0;
     
     
     
@@ -48,16 +53,17 @@ int main(void)
         if (IsKeyPressed(KEY_ENTER)) pause = !pause;
         if (pause==false)gameRun(&obstacle);
         jump(&player);
+        colisionOrNot=colision(&player,&obstacle);
         //----------------------------------------------------------------------------------
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawText("Run!", 350,40,50, RED);
-            DrawCircle(player.position.x, player.position.y, 30, DARKBLUE);
+            DrawText(TextFormat("Run! %d",colisionOrNot), 350,40,50, RED);
+            DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
             DrawLine(0,350, screenWidth,350, BLACK);
-            DrawRectangle(obstacle.position.x,obstacle.position.y,50,80,BLACK);
+            DrawRectangle(obstacle.position.x,obstacle.position.y,obstacle.taille.x,obstacle.taille.y,BLACK);
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
@@ -104,4 +110,16 @@ void jump(Player * player){
             }
             break;
     }
+}
+
+int colision(Player * player,Obstacle * obstacle){
+    if(player->position.x+player->taille > obstacle->position.x &&
+    player->position.x-player->taille < obstacle->position.x+obstacle->taille.x &&
+    player->position.y+player->taille > obstacle->position.y &&
+    player->position.y-player->taille < obstacle->position.y+obstacle->taille.y
+    ){
+        return 1;
+    }
+    else return 0;
+    
 }
