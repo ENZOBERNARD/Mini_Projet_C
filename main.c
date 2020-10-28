@@ -13,6 +13,7 @@
     Vector2 position;
     Vector2 taille;
     float speed;
+    bool alwaysjump;
     } Obstacle;
    
 
@@ -29,9 +30,10 @@ int main(void)
     Obstacle obstacle;
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
-    obstacle.position= (Vector2){(float)155, (float)270};
+    obstacle.position= (Vector2){(float)750, (float)270};
     obstacle.taille= (Vector2){(float)50, (float)80};
-    obstacle.speed=0.2;
+    obstacle.speed=1.5;
+    obstacle.alwaysjump=false;
     bool pause=true;
     player.jumpState=0;
     player.jumpFrame=0;
@@ -53,6 +55,7 @@ int main(void)
         if (IsKeyPressed(KEY_ENTER)) pause = !pause;
         if (pause==false)gameRun(&obstacle);
         jump(&player);
+        surObstacle(&player, &obstacle);
         colisionOrNot=colision(&player,&obstacle);
         //----------------------------------------------------------------------------------
 
@@ -60,10 +63,16 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawText(TextFormat("Run! %d",colisionOrNot), 350,40,50, RED);
+            if(colisionOrNot==0){
+            DrawText(TextFormat("Run! %d %d",colisionOrNot,player.jumpState), 350,40,50, RED);
             DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
             DrawLine(0,350, screenWidth,350, BLACK);
             DrawRectangle(obstacle.position.x,obstacle.position.y,obstacle.taille.x,obstacle.taille.y,BLACK);
+            }
+            else{
+                DrawText(TextFormat("t'a perdu"), 350,40,50, RED);
+            }
+            
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
@@ -122,4 +131,16 @@ int colision(Player * player,Obstacle * obstacle){
     }
     else return 0;
     
+}
+
+void surObstacle(Player * player, Obstacle * obstacle){
+    if(player->position.y+player->taille == obstacle->position.y &&
+     player->position.x-player->taille < obstacle->position.x+obstacle->taille.x &&
+     player->position.x+player->taille > obstacle->position.x &&
+     player->jumpState!=0 &&
+     obstacle->alwaysjump==false){
+         player->jumpState=0;
+         player->jumpFrame=0;
+         obstacle->alwaysjump=true;
+     }
 }
