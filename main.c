@@ -4,7 +4,7 @@
     Vector2 position;
     int taille;
     float speed;
-    bool canJump;
+    int state; //0:sur le sol 1:Saute 2:tombe 3:Sur un obstacle
     int jumpState;
     int jumpFrame;
     } Player;
@@ -37,6 +37,7 @@ int main(void)
     bool pause=true;
     player.jumpState=0;
     player.jumpFrame=0;
+    player.state=0;
     int colisionOrNot=0;
     
     
@@ -97,6 +98,7 @@ void jump(Player * player){
         case 0 :
             if(IsKeyDown(KEY_SPACE)){
                 player->jumpState=1;
+                player->state=1;
             }
             break;
         case 1 :
@@ -106,6 +108,7 @@ void jump(Player * player){
             }
             else{
                 player->jumpState=2;
+                player->state=2;
             }
             break;
         case 2:
@@ -116,6 +119,7 @@ void jump(Player * player){
             else{
                 player->jumpState=0;
                 player->jumpFrame=0;
+                player->state=0;
             }
             break;
     }
@@ -141,6 +145,14 @@ void surObstacle(Player * player, Obstacle * obstacle){
      obstacle->alwaysjump==false){
          player->jumpState=0;
          player->jumpFrame=0;
+         player->state=4;
          obstacle->alwaysjump=true;
+     }
+     else if((player->position.x-player->taille > obstacle->position.x+obstacle->taille.x || player->position.x+player->taille < obstacle->position.x)&&
+     player->position.y+player->taille == obstacle->position.y &&
+     player->state==4
+     ){
+         player->jumpState=2;
+         player->jumpFrame=25;
      }
 }
