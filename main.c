@@ -10,8 +10,7 @@
     } Player;
     
     typedef struct Obstacle {
-    Vector2 position;
-    Vector2 taille;
+    Rectangle rect;
     float speed;
     bool alwaysjump;
     } Obstacle;
@@ -28,8 +27,9 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    int menu_state; //0:Menu demarrage 1:Debut 2:Run 3:GAME OVER
+    int menu_state=0; //0:Menu demarrage 1:Debut 2:Run 3:GAME OVER
     int obstacle_counter;
+    Vector2 mousePosition = { 0 };
     
     const int screenWidth = 800;
     const int screenHeight = 450;
@@ -45,18 +45,30 @@ int main(void)
     Obstacle obstacle6;
     
     
-    obstacle1.taille= (Vector2){(float)50, (float)80};
-    obstacle1.position= (Vector2){(float)750, (float)350-obstacle1.taille.y};
-    obstacle2.taille= (Vector2){(float)50, (float)20};
-    obstacle2.position= (Vector2){(float)950, (float)350-obstacle2.taille.y};
-    obstacle3.taille= (Vector2){(float)50, (float)100};
-    obstacle3.position= (Vector2){(float)1200, (float)350-obstacle3.taille.y};
-    obstacle4.taille= (Vector2){(float)50, (float)40};
-    obstacle4.position= (Vector2){(float)1450, (float)350-obstacle4.taille.y};
-    obstacle5.taille= (Vector2){(float)50, (float)30};
-    obstacle5.position= (Vector2){(float)1800, (float)350-obstacle5.taille.y};
-    obstacle6.taille= (Vector2){(float)50, (float)10};
-    obstacle6.position= (Vector2){(float)2000, (float)350-obstacle6.taille.y};
+    obstacle1.rect.x=100;
+    obstacle1.rect.width=50;
+    obstacle1.rect.height=80;
+    obstacle2.rect.x=950;
+    obstacle2.rect.width=50;
+    obstacle2.rect.height=80;
+    obstacle3.rect.x=1200;
+    obstacle3.rect.width=50;
+    obstacle3.rect.height=40;
+    obstacle4.rect.x=1450;
+    obstacle4.rect.width=50;
+    obstacle4.rect.height=40;
+    obstacle5.rect.x=1800;
+    obstacle5.rect.width=50;
+    obstacle5.rect.height=40;
+    obstacle6.rect.x=2000;
+    obstacle6.rect.width=50;
+    obstacle6.rect.height=40;
+    obstacle1.rect.y=350- obstacle1.rect.height;
+    obstacle2.rect.y=350- obstacle2.rect.height;
+    obstacle3.rect.y=350- obstacle3.rect.height;
+    obstacle4.rect.y=350- obstacle4.rect.height;
+    obstacle5.rect.y=350- obstacle5.rect.height;
+    obstacle6.rect.y=350- obstacle6.rect.height;
     
     lvl1.obstacles[0]=obstacle1;
     lvl1.obstacles[1]=obstacle2;
@@ -70,9 +82,13 @@ int main(void)
     
     
     for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
-    lvl1.obstacles[obstacle_counter].speed=1.5;
+    lvl1.obstacles[obstacle_counter].speed=1;
     lvl1.obstacles[obstacle_counter].alwaysjump=false;
     }
+    //Menu demarrer
+    
+    Rectangle play={screenWidth/2-100,screenHeight/2-40,200,80};
+    
     
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
@@ -95,29 +111,35 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
+        mousePosition = GetMousePosition();
+        
         if (IsKeyPressed(KEY_ENTER)) pause = !pause;
         if (pause==false)gameRun(&lvl1);
-        jump(&player);
         surObstacle(&player, &lvl1);
+        jump(&player);
+        
         colisionOrNot=colision(&player,&lvl1);
+        if(CheckCollisionPointRec(mousePosition,play) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) menu_state=1;
+        
         //----------------------------------------------------------------------------------
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
         //Menu entrée
+        ClearBackground(RAYWHITE);
         if(menu_state==0){
-            DrawRectangle
+            DrawRectangleRec(play,BLACK);
         }
-        
+        else if(menu_state==1){
       
             ClearBackground(RAYWHITE);
             //if(colisionOrNot==0){
-            DrawText(TextFormat("Run! %d %d",colisionOrNot,player.jumpState), 350,40,50, RED);
+            DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50, RED);
             DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
             DrawLine(0,350, screenWidth,350, BLACK);
             for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
-                DrawRectangle(lvl1.obstacles[obstacle_counter].position.x,lvl1.obstacles[obstacle_counter].position.y,lvl1.obstacles[obstacle_counter].taille.x,lvl1.obstacles[obstacle_counter].taille.y,BLACK);
+                DrawRectangleRec(lvl1.obstacles[obstacle_counter].rect,BLACK);
                 }
             //Barre d'avancée
              DrawRectangleLines(40,40,200,20,BLACK);
@@ -126,7 +148,7 @@ int main(void)
             //else{
              //   DrawText(TextFormat("t'a perdu"), 350,40,50, RED);
             //}
-            
+        }    
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
@@ -144,7 +166,7 @@ int main(void)
 void gameRun(Level * lvl){
     int obstacle_counter;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
-    lvl->obstacles[obstacle_counter].position.x =lvl->obstacles[obstacle_counter].position.x-2*lvl->obstacles[obstacle_counter].speed;
+    lvl->obstacles[obstacle_counter].rect.x =lvl->obstacles[obstacle_counter].rect.x-2*lvl->obstacles[obstacle_counter].speed;
     }
     lvl->avancee+=2;
 }
@@ -181,14 +203,14 @@ void jump(Player * player){
     }
 }
 
-int colision(Player * player,Level * lvl){
+int colision(Player * player,Level * lvl){ //J'ai créer cette fonction en pensant que raylib n'avait pas de fonction gérant les collisions
     int obstacle_counter;
     int retour=0;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
-        if(player->position.x+player->taille > lvl->obstacles[obstacle_counter].position.x &&
-            player->position.x-player->taille < lvl->obstacles[obstacle_counter].position.x+lvl->obstacles[obstacle_counter].taille.x &&
-            player->position.y+player->taille > lvl->obstacles[obstacle_counter].position.y &&
-            player->position.y-player->taille <lvl->obstacles[obstacle_counter].position.y+lvl->obstacles[obstacle_counter].taille.y)
+        if(player->position.x+player->taille > lvl->obstacles[obstacle_counter].rect.x &&
+            player->position.x-player->taille < lvl->obstacles[obstacle_counter].rect.x+lvl->obstacles[obstacle_counter].rect.width &&
+            player->position.y+player->taille > lvl->obstacles[obstacle_counter].rect.y &&
+            player->position.y-player->taille <lvl->obstacles[obstacle_counter].rect.y+lvl->obstacles[obstacle_counter].rect.height)
             {
             retour=1;
             break;
@@ -201,9 +223,9 @@ int colision(Player * player,Level * lvl){
 void surObstacle(Player * player, Level * lvl){
     int obstacle_counter;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
-        if(player->position.y+player->taille == lvl->obstacles[obstacle_counter].position.y &&
-        player->position.x-player->taille < lvl->obstacles[obstacle_counter].position.x+lvl->obstacles[obstacle_counter].taille.x &&
-        player->position.x+player->taille > lvl->obstacles[obstacle_counter].position.x &&
+        if(player->position.y+player->taille == lvl->obstacles[obstacle_counter].rect.y &&
+        player->position.x-player->taille < lvl->obstacles[obstacle_counter].rect.x+lvl->obstacles[obstacle_counter].rect.width &&
+        player->position.x+player->taille > lvl->obstacles[obstacle_counter].rect.x &&
         player->jumpState!=0 &&
         lvl->obstacles[obstacle_counter].alwaysjump==false){
             player->jumpState=0;
@@ -211,11 +233,11 @@ void surObstacle(Player * player, Level * lvl){
             player->state=4;
             lvl->obstacles[obstacle_counter].alwaysjump=true;
         }
-        else if((player->position.x-player->taille > lvl->obstacles[obstacle_counter].position.x+lvl->obstacles[obstacle_counter].taille.x || player->position.x+player->taille < lvl->obstacles[obstacle_counter].position.x)&&
-        player->position.y+player->taille == lvl->obstacles[obstacle_counter].position.y &&
+        else if(((player->position.x-player->taille > lvl->obstacles[obstacle_counter].rect.x+lvl->obstacles[obstacle_counter].rect.width) || (player->position.x+player->taille < lvl->obstacles[obstacle_counter].rect.x))&&
+        player->position.y+player->taille == lvl->obstacles[obstacle_counter].rect.y &&
         player->state==4
         ){
-            player->jumpState=2;
+            player->jumpState=0;
             player->jumpFrame=25;
         }
     }
