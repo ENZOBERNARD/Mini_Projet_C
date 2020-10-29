@@ -28,8 +28,9 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-
+    int menu_state; //0:Menu demarrage 1:Debut 2:Run 3:GAME OVER
     int obstacle_counter;
+    
     const int screenWidth = 800;
     const int screenHeight = 450;
     
@@ -104,6 +105,12 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
+        //Menu entrée
+        if(menu_state==0){
+            DrawRectangle
+        }
+        
+      
             ClearBackground(RAYWHITE);
             //if(colisionOrNot==0){
             DrawText(TextFormat("Run! %d %d",colisionOrNot,player.jumpState), 350,40,50, RED);
