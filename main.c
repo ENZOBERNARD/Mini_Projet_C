@@ -32,6 +32,13 @@ int main(void)
     int obstacle_counter;
     Vector2 mousePosition = { 0 };
     
+    
+    Image image_fondH=LoadImage("background_haut.png");
+    Texture2D backgroundH = LoadTextureFromImage(image_fondH);  
+    UnloadImage(image_fondH); 
+    float scrollingB = 0.0f;
+    float scrollingH = 0.0f;
+    
     const int screenWidth = 800;
     const int screenHeight = 450;
     
@@ -101,7 +108,7 @@ int main(void)
     int colisionOrNot=0;
     
     //menu GAME OVER
-    Rectangle playAgain={screenWidth/2-100,screenHeight/2-40,200,80};
+    Rectangle playAgain={screenWidth/2-100,screenHeight/2+20,200,80};
     
     
     
@@ -141,7 +148,7 @@ int main(void)
         //Menu entrée
         if(menu_state==0){
             ClearBackground(RAYWHITE);
-            DrawRectangleRec(play,BLACK);
+            DrawRectangleLinesEx(play,5,BLACK);
             DrawText(TextFormat("PLAY"), 322,200,60, RED);
         }
         
@@ -149,6 +156,9 @@ int main(void)
       
             ClearBackground(RAYWHITE);
             //if(colisionOrNot==0){
+            //background
+            DrawTexture(backgroundH,100,100, WHITE);
+         
             //ATH
             DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50, RED);
             
@@ -168,8 +178,9 @@ int main(void)
             }
         else if(menu_state==2){
             ClearBackground(RAYWHITE);
-            DrawRectangleRec(playAgain,BLACK);
+            DrawRectangleLinesEx(playAgain,5,BLACK);
             DrawText(TextFormat("GAME OVER"), 125,90,90, RED);
+            DrawText(TextFormat("%.0f %%",lvl1.avancee/lvl1.longueur*100), 350,170,60, RED);
         }
         
         else if(menu_state==3){
