@@ -12,7 +12,7 @@
     typedef struct Obstacle {
     Rectangle rect;
     float speed;
-    bool alwaysjump;
+    bool playerOn;
     } Obstacle;
     
     typedef struct Level {
@@ -20,6 +20,7 @@
         int number_of_obstacle;
         int number;
         float avancee;
+        float longueur;
     } Level;
    
 
@@ -27,7 +28,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    int menu_state=0; //0:Menu demarrage 1:Debut 2:Run 3:GAME OVER
+    int menu_state=0; //0:Menu demarrage 1:Run 2:GAME OVER 3:Win
     int obstacle_counter;
     Vector2 mousePosition = { 0 };
     
@@ -45,9 +46,9 @@ int main(void)
     Obstacle obstacle6;
     
     
-    obstacle1.rect.x=100;
+    obstacle1.rect.x=750;
     obstacle1.rect.width=50;
-    obstacle1.rect.height=80;
+    obstacle1.rect.height=40;
     obstacle2.rect.x=950;
     obstacle2.rect.width=50;
     obstacle2.rect.height=80;
@@ -79,11 +80,12 @@ int main(void)
     lvl1.number_of_obstacle=6;
     lvl1.number=1;
     lvl1.avancee=0;
+    lvl1.longueur=2300;
     
     
     for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
     lvl1.obstacles[obstacle_counter].speed=1;
-    lvl1.obstacles[obstacle_counter].alwaysjump=false;
+    lvl1.obstacles[obstacle_counter].playerOn=false;
     }
     //Menu demarrer
     
@@ -97,6 +99,9 @@ int main(void)
     player.jumpFrame=0;
     player.state=0;
     int colisionOrNot=0;
+    
+    //menu GAME OVER
+    Rectangle playAgain={screenWidth/2-100,screenHeight/2-40,200,80};
     
     
     
@@ -113,13 +118,20 @@ int main(void)
         //----------------------------------------------------------------------------------
         mousePosition = GetMousePosition();
         
-        if (IsKeyPressed(KEY_ENTER)) pause = !pause;
-        if (pause==false)gameRun(&lvl1);
-        surObstacle(&player, &lvl1);
-        jump(&player);
+        if(menu_state==0){
+            if(CheckCollisionPointRec(mousePosition,play) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) menu_state=1;
+        }
         
-        colisionOrNot=colision(&player,&lvl1);
-        if(CheckCollisionPointRec(mousePosition,play) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) menu_state=1;
+        if(menu_state==1){
+            if (IsKeyPressed(KEY_ENTER)) pause = !pause;
+            if (pause==false)gameRun(&lvl1);
+            surObstacle(&player, &lvl1);
+            jump(&player);
+            colisionOrNot=colision(&player,&lvl1);
+            if(colisionOrNot==1)menu_state=2;
+            if(checkWin(&lvl1)==1)menu_state=3;
+        }
+        
         
         //----------------------------------------------------------------------------------
 
@@ -127,32 +139,49 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
         //Menu entrée
-        ClearBackground(RAYWHITE);
         if(menu_state==0){
+            ClearBackground(RAYWHITE);
             DrawRectangleRec(play,BLACK);
+            DrawText(TextFormat("PLAY"), 322,200,60, RED);
         }
+        
         else if(menu_state==1){
       
             ClearBackground(RAYWHITE);
             //if(colisionOrNot==0){
+            //ATH
             DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50, RED);
+            
+            //Player
             DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
+            
+            //Sol
             DrawLine(0,350, screenWidth,350, BLACK);
+            
+            //Niveau
             for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
                 DrawRectangleRec(lvl1.obstacles[obstacle_counter].rect,BLACK);
                 }
             //Barre d'avancée
-             DrawRectangleLines(40,40,200,20,BLACK);
+             DrawRectangleLines(40,40,lvl1.longueur/10,20,BLACK);
              DrawRectangle(40,40,lvl1.avancee/10,20,BLUE);
-            //}
-            //else{
-             //   DrawText(TextFormat("t'a perdu"), 350,40,50, RED);
-            //}
-        }    
+            }
+        else if(menu_state==2){
+            ClearBackground(RAYWHITE);
+            DrawRectangleRec(playAgain,BLACK);
+            DrawText(TextFormat("GAME OVER"), 125,90,90, RED);
+        }
+        
+        else if(menu_state==3){
+            ClearBackground(RAYWHITE);
+            DrawText(TextFormat("Bravo !"), 125,90,90, RED);
+        }
+        
+     
         EndDrawing();
         //----------------------------------------------------------------------------------
-    }
-
+  
+        }
     // De-Initialization
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
@@ -227,18 +256,26 @@ void surObstacle(Player * player, Level * lvl){
         player->position.x-player->taille < lvl->obstacles[obstacle_counter].rect.x+lvl->obstacles[obstacle_counter].rect.width &&
         player->position.x+player->taille > lvl->obstacles[obstacle_counter].rect.x &&
         player->jumpState!=0 &&
-        lvl->obstacles[obstacle_counter].alwaysjump==false){
+        lvl->obstacles[obstacle_counter].playerOn==false){
             player->jumpState=0;
             player->jumpFrame=0;
             player->state=4;
-            lvl->obstacles[obstacle_counter].alwaysjump=true;
+            lvl->obstacles[obstacle_counter].playerOn=true;
         }
         else if(((player->position.x-player->taille > lvl->obstacles[obstacle_counter].rect.x+lvl->obstacles[obstacle_counter].rect.width) || (player->position.x+player->taille < lvl->obstacles[obstacle_counter].rect.x))&&
         player->position.y+player->taille == lvl->obstacles[obstacle_counter].rect.y &&
-        player->state==4
+        player->state==4 &&
+        lvl->obstacles[obstacle_counter].playerOn==true
         ){
-            player->jumpState=0;
+            player->jumpState=2;
             player->jumpFrame=25;
+            lvl->obstacles[obstacle_counter].playerOn=false;
         }
     }
+}
+
+int checkWin(Level * lvl){
+    int win=0;
+    if(lvl->longueur==lvl->avancee)win=1;
+    return win;
 }
