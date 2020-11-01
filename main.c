@@ -50,7 +50,7 @@ int main(void)
     Player player;
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
-    bool pause=true;
+    bool pause=false;
     player.jumpState=0;
     player.jumpFrame=0;
     player.state=0;
@@ -63,7 +63,8 @@ int main(void)
     
     
     //menu GAME OVER
-    Rectangle playAgain={screenWidth/2-100,screenHeight/2+20,200,80};
+    Rectangle playAgain={screenWidth/2-90,screenHeight/2+20,180,50};
+    Rectangle playAgainautreniveau={190,300,470,60};
     
     //menu Bravo
     Rectangle ceNiveau={80,220,300,40};
@@ -88,7 +89,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         mousePosition = GetMousePosition();
         
-        if(menu_state==0){
+        if(menu_state==0){ //menu choix du niveau
             if(CheckCollisionPointRec(mousePosition,level1) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 menu_state=1; generateLevel(&lvl1,1);
             }
@@ -96,9 +97,18 @@ int main(void)
             menu_state=1;
             generateLevel(&lvl1,2);
             }
+            if(CheckCollisionPointRec(mousePosition,level1)){
+                sourisOn=1;
+            }
+            else if(CheckCollisionPointRec(mousePosition,level2)){
+                sourisOn=2;
+            }
+            else {
+                sourisOn=0;
+            }
         }
         
-        if(menu_state==1){
+        if(menu_state==1){ //en jeu
             if (IsKeyPressed(KEY_ENTER)) pause = !pause;
             if (pause==false)gameRun(&lvl1);
             surObstacle(&player, &lvl1);
@@ -108,14 +118,27 @@ int main(void)
             if(checkWin(&lvl1)==1)menu_state=3;
         }
         
-        if(menu_state==2){
+        if(menu_state==2){ //menu game over
             if(CheckCollisionPointRec(mousePosition,playAgain) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 menu_state=1;
                 generateLevel(&lvl1,lvl1.number);
             }
+            if(CheckCollisionPointRec(mousePosition,playAgainautreniveau) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                menu_state=0;
+   
+            }
+            if(CheckCollisionPointRec(mousePosition,playAgain)){
+                sourisOn=1;
+            }
+            else if(CheckCollisionPointRec(mousePosition,playAgainautreniveau)){
+                sourisOn=2;
+            }
+            else{
+                sourisOn=0;
+            }
         }
         
-        if(menu_state==3){
+        if(menu_state==3){ //menu niveau terminé
             if(CheckCollisionPointRec(mousePosition,ceNiveau) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 menu_state=1;
                 generateLevel(&lvl1,lvl1.number);
@@ -123,10 +146,10 @@ int main(void)
             if(CheckCollisionPointRec(mousePosition,autreNiveau) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 menu_state=0;
             }
-            if(CheckCollisionPointRec(mousePosition,ceNiveau){
+            if(CheckCollisionPointRec(mousePosition,ceNiveau)){
                 sourisOn=1;
             }
-            else if(CheckCollisionPointRec(mousePosition,autreNiveau){
+            else if(CheckCollisionPointRec(mousePosition,autreNiveau)){
                 sourisOn=2;
             }
             else{
@@ -141,23 +164,25 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
         //Menu entrée
-        if(menu_state==0){
+        if(menu_state==0){ //choix niveau
             ClearBackground(RAYWHITE);
             DrawText(TextFormat("Choose level" ), 240,100,50,RED);
+            if(sourisOn==1){
+                DrawRectangleRec(level1,GRAY);
+            }
+            if(sourisOn==2){
+                DrawRectangleRec(level2,GRAY);
+            }
             DrawRectangleLinesEx(level1,5,BLACK);
             DrawRectangleLinesEx(level2,5,BLACK);
             DrawText(TextFormat("1"), 343,200,60,RED);
             DrawText(TextFormat("2"), 433,200,60,RED);
         }
         
-        else if(menu_state==1){
-      
-            ClearBackground(lvl1.background_color);
-            //if(colisionOrNot==0){
+        else if(menu_state==1){ //En jeu
             //background
-         
-            //ATH
-            DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50,lvl1.texte_color);
+            ClearBackground(lvl1.background_color);
+  
             
             //Player
             DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
@@ -176,20 +201,28 @@ int main(void)
         }
         else if(menu_state==2){ // Menu Game Over
             ClearBackground(RAYWHITE);
-            DrawRectangleLinesEx(playAgain,5,BLACK);
             DrawText(TextFormat("GAME OVER"), 125,90,90, RED);
             DrawText(TextFormat("%.0f %%",lvl1.avancee/lvl1.longueur*100), 350,170,60, RED);
+            DrawText(TextFormat("Ressayer"), 340,250,30, RED);
+            DrawText(TextFormat("Ressayer un autre niveau"), 230,300,30, RED);
+            if(sourisOn==1){
+                DrawTriangle((Vector2){(float)330,(float)260},(Vector2){(float)315,(float)250},(Vector2){(float)315,(float)270},RED);
+            }
+            if(sourisOn==2){
+                DrawTriangle((Vector2){(float)220,(float)310},(Vector2){(float)205,(float)300},(Vector2){(float)205,(float)320},RED);
+            }
         }
         
         else if(menu_state==3){ //Menu niveau terminé
             ClearBackground(RAYWHITE);
-            DrawText(TextFormat("Bravo!"), 250,90,90, RED);
+            DrawText(TextFormat("Bravo !"), 250,90,90, RED);
             DrawText(TextFormat("Rejouer ce niveau"), 90,230,20, RED);
             DrawText(TextFormat("Rejouer sur un autre niveau"), 90,300,20, RED);
-            DrawRectangleLinesEx(ceNiveau,5,RAYWHITE);
-            DrawRectangleLinesEx(autreNiveau,5,RAYWHITE);
             if(sourisOn==1){
-                
+                DrawTriangle((Vector2){(float)80,(float)240},(Vector2){(float)70,(float)235},(Vector2){(float)70,(float)245},RED);
+            }
+            else if(sourisOn==2){
+                DrawTriangle((Vector2){(float)80,(float)310},(Vector2){(float)70,(float)305},(Vector2){(float)70,(float)315},RED);
             }
         }
         
