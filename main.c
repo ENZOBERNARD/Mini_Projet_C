@@ -7,6 +7,7 @@
     int state; //0:sur le sol 1:Saute 2:tombe 3:Sur un obstacle
     int jumpState;
     int jumpFrame;
+    Color couleur;
     } Player;
     
     typedef struct Obstacle {
@@ -27,13 +28,12 @@
         char * name;
     } Level;
    
-    
 
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    int menu_state=0; //0:Menu demarrage 1:Run 2:GAME OVER 3:Win
+    int menu_state=0; //0:Menu demarrage 1:Run 2:GAME OVER 3:Win 4:choix skin
     int obstacle_counter;
     Vector2 mousePosition = { 0 };
     
@@ -54,12 +54,18 @@ int main(void)
     player.jumpState=0;
     player.jumpFrame=0;
     player.state=0;
+    player.couleur=BLUE;
     int colisionOrNot=0;
+    
+    //Menu Pause
+    Rectangle reprendre={screenWidth/2-100,180,200,50};
+    Rectangle quitter={screenWidth/2-100,260,200,50};
     
     
     //Menu demarrer
     Rectangle level1={screenWidth/2-90,screenHeight/2-40,80,80};
     Rectangle level2={screenWidth/2+10,screenHeight/2-40,80,80};
+    Rectangle choixskin={460,340,100,40};
     
     
     //menu GAME OVER
@@ -71,6 +77,19 @@ int main(void)
     Rectangle autreNiveau={80,290,300,45};
     int sourisOn=0;
     
+    //menu choix couleur perso
+    Rectangle Bleu={125,50,150,150};
+    Rectangle Violet={325,50,150,150};
+    Rectangle Rose={525,50,150,150};
+    Rectangle Orange={125,250,150,150};
+    Rectangle Jaune={325,250,150,150};
+    Rectangle Vert={525,250,150,150};
+    Rectangle bBleu={125,175,150,25};
+    Rectangle bViolet={325,50,150,150};
+    Rectangle bRose={525,50,150,150};
+    Rectangle bOrange={125,250,150,150};
+    Rectangle bJaune={325,250,150,150};
+    Rectangle bVert={525,250,150,150};
     
     //CHoix du level ----------------------------------------------------------------------
     Level lvl1;
@@ -97,11 +116,17 @@ int main(void)
             menu_state=1;
             generateLevel(&lvl1,2);
             }
+            if(CheckCollisionPointRec(mousePosition,choixskin) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            menu_state=4;
+            }
             if(CheckCollisionPointRec(mousePosition,level1)){
                 sourisOn=1;
             }
             else if(CheckCollisionPointRec(mousePosition,level2)){
                 sourisOn=2;
+            }
+            if(CheckCollisionPointRec(mousePosition,choixskin)){
+                sourisOn=3;
             }
             else {
                 sourisOn=0;
@@ -110,12 +135,31 @@ int main(void)
         
         if(menu_state==1){ //en jeu
             if (IsKeyPressed(KEY_ENTER)) pause = !pause;
-            if (pause==false)gameRun(&lvl1);
-            surObstacle(&player, &lvl1);
-            jump(&player);
-            colisionOrNot=colision(&player,&lvl1);
-            if(colisionOrNot==1)menu_state=2;
-            if(checkWin(&lvl1)==1)menu_state=3;
+            if(pause==false){
+                if (pause==false)gameRun(&lvl1);
+                surObstacle(&player, &lvl1);
+                jump(&player);
+                colisionOrNot=colision(&player,&lvl1);
+                if(colisionOrNot==1)menu_state=2;
+                if(checkWin(&lvl1)==1)menu_state=3;
+            }
+            else{
+                if(CheckCollisionPointRec(mousePosition,reprendre) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                    pause= !pause;
+                }
+                if(CheckCollisionPointRec(mousePosition,quitter) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                    menu_state=0;
+                }
+                if(CheckCollisionPointRec(mousePosition,reprendre)){
+                    sourisOn=1;
+                }
+                else if(CheckCollisionPointRec(mousePosition,quitter)){
+                    sourisOn=2;
+                }
+                else{
+                    sourisOn=0;
+                }
+            }
         }
         
         if(menu_state==2){ //menu game over
@@ -157,6 +201,56 @@ int main(void)
             }
         }
         
+        if(menu_state==4){
+             if(CheckCollisionPointRec(mousePosition,Bleu) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=BLUE;
+                menu_state=0;
+            }
+             if(CheckCollisionPointRec(mousePosition,Orange) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=ORANGE;
+                menu_state=0;
+            }
+             if(CheckCollisionPointRec(mousePosition,Jaune) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=YELLOW;
+                menu_state=0;
+            }
+             if(CheckCollisionPointRec(mousePosition,Vert) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=GREEN;
+                menu_state=0;
+            }
+             if(CheckCollisionPointRec(mousePosition,Rose) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=PINK;
+                menu_state=0;
+            } 
+            if(CheckCollisionPointRec(mousePosition,Violet) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                player.couleur=PURPLE;
+                menu_state=0;
+            }
+            
+            
+            if(CheckCollisionPointRec(mousePosition,Bleu)){
+                sourisOn=1;
+            }
+            else if(CheckCollisionPointRec(mousePosition,Jaune)){
+                sourisOn=2;
+            }
+            else if(CheckCollisionPointRec(mousePosition,Vert)){
+                sourisOn=3;
+            }
+            else if(CheckCollisionPointRec(mousePosition,Violet)){
+                sourisOn=4;
+            }
+            else if(CheckCollisionPointRec(mousePosition,Rose)){
+                sourisOn=5;
+            }
+            else if(CheckCollisionPointRec(mousePosition,Orange)){
+                sourisOn=6;
+            }
+            else{
+                sourisOn=0;
+            }
+        }
+        
         
         //----------------------------------------------------------------------------------
 
@@ -173,10 +267,13 @@ int main(void)
             if(sourisOn==2){
                 DrawRectangleRec(level2,GRAY);
             }
+            DrawRectangle(460,340,100,40,player.couleur);
             DrawRectangleLinesEx(level1,5,BLACK);
             DrawRectangleLinesEx(level2,5,BLACK);
+            DrawRectangleLinesEx(choixskin,5,BLACK);
             DrawText(TextFormat("1"), 343,200,60,RED);
             DrawText(TextFormat("2"), 433,200,60,RED);
+            DrawText(TextFormat("apparence"),270,340,30,RED);
         }
         
         else if(menu_state==1){ //En jeu
@@ -185,7 +282,7 @@ int main(void)
   
             
             //Player
-            DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
+            DrawCircle(player.position.x, player.position.y, player.taille, player.couleur);
             
             //Sol
             DrawLine(0,350, screenWidth,350, lvl1.obstacle_color);
@@ -198,6 +295,21 @@ int main(void)
             //Barre d'avancée
              DrawRectangleLines(40,40,lvl1.longueur/10,20,lvl1.texte_color);
              DrawRectangle(40,40,lvl1.avancee/10,20,lvl1.texte_color);
+             
+             if(pause==true){ //Menu Pause
+                 DrawRectangle(screenWidth/2-100,screenHeight/2-150,200,300,WHITE);
+                 DrawRectangleLines(screenWidth/2-100,screenHeight/2-150,200,300,BLACK);
+                 DrawText(TextFormat("Pause" ), 325,100,50,RED);
+                 DrawText(TextFormat("Reprendre" ), 325,185,30,RED);
+                 DrawText(TextFormat("Quitter" ), 345,265,30,RED);
+                 if(sourisOn==1){
+                     DrawTriangle((Vector2){(float)315,(float)200},(Vector2){(float)305,(float)190},(Vector2){(float)305,(float)210},RED);
+                 }
+                 if(sourisOn==2){
+                     DrawTriangle((Vector2){(float)335,(float)275},(Vector2){(float)325,(float)265},(Vector2){(float)325,(float)285},RED);
+                 }
+                 
+             }
         }
         else if(menu_state==2){ // Menu Game Over
             ClearBackground(RAYWHITE);
@@ -223,6 +335,40 @@ int main(void)
             }
             else if(sourisOn==2){
                 DrawTriangle((Vector2){(float)80,(float)310},(Vector2){(float)70,(float)305},(Vector2){(float)70,(float)315},RED);
+            }
+        }
+        
+        if(menu_state==4){
+            ClearBackground(RAYWHITE);
+            DrawRectangleRec(Bleu,BLUE);
+            DrawRectangleRec(Jaune,YELLOW);
+            DrawRectangleRec(Violet,PURPLE);
+            DrawRectangleRec(Rose,PINK);
+            DrawRectangleRec(Vert,GREEN);
+            DrawRectangleRec(Orange,ORANGE);
+            DrawRectangleLinesEx(Bleu,5,BLACK);
+            DrawRectangleLinesEx(Jaune,5,BLACK);
+            DrawRectangleLinesEx(Violet,5,BLACK);
+            DrawRectangleLinesEx(Rose,5,BLACK);
+            DrawRectangleLinesEx(Vert,5,BLACK);
+            DrawRectangleLinesEx(Orange,5,BLACK);
+            if(sourisOn==1){
+                DrawRectangleLinesEx(Bleu,10,BLACK);
+            }
+            if(sourisOn==2){
+                DrawRectangleLinesEx(Jaune,10,BLACK);
+            }
+            if(sourisOn==3){
+                DrawRectangleLinesEx(Vert,10,BLACK);
+            }
+            if(sourisOn==4){
+                DrawRectangleLinesEx(Violet,10,BLACK);
+            }
+            if(sourisOn==5){
+                DrawRectangleLinesEx(Rose,10,BLACK);
+            }
+            if(sourisOn==6){
+                DrawRectangleLinesEx(Orange,10,BLACK);
             }
         }
         
@@ -419,7 +565,7 @@ void generateLevel(Level * lvl1,int numero){
         lvl1->number_of_obstacle=6;
         lvl1->number=2;
         lvl1->avancee=0;
-        lvl1->longueur=100;
+        lvl1->longueur=1500;
         
         for(obstacle_counter=0;obstacle_counter<lvl1->number_of_obstacle;obstacle_counter++){
         lvl1->obstacles[obstacle_counter].speed=1;
