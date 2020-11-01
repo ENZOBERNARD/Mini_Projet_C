@@ -21,6 +21,10 @@
         int number;
         float avancee;
         float longueur;
+        Color obstacle_color;
+        Color background_color;
+        Color texte_color;
+        char * name;
     } Level;
    
     
@@ -54,65 +58,22 @@ int main(void)
     
     
     //Menu demarrer
-    Rectangle play={screenWidth/2-100,screenHeight/2-40,200,80};
+    Rectangle level1={screenWidth/2-90,screenHeight/2-40,80,80};
+    Rectangle level2={screenWidth/2+10,screenHeight/2-40,80,80};
     
     
     //menu GAME OVER
     Rectangle playAgain={screenWidth/2-100,screenHeight/2+20,200,80};
     
+    //menu Bravo
+    Rectangle ceNiveau={80,220,300,40};
+    Rectangle autreNiveau={80,290,300,45};
+    int sourisOn=0;
+    
     
     //CHoix du level ----------------------------------------------------------------------
     Level lvl1;
-    int level_numero=1;
-    Obstacle obstacle1;
-    Obstacle obstacle2;
-    Obstacle obstacle3;
-    Obstacle obstacle4;
-    Obstacle obstacle5;
-    Obstacle obstacle6; 
-    if(level_numero=1){
-        obstacle1.rect.x=750;
-        obstacle1.rect.width=50;
-        obstacle1.rect.height=40;
-        obstacle2.rect.x=950;
-        obstacle2.rect.width=50;
-        obstacle2.rect.height=80;
-        obstacle3.rect.x=1200;
-        obstacle3.rect.width=50;
-        obstacle3.rect.height=40;
-        obstacle4.rect.x=1450;
-        obstacle4.rect.width=50;
-        obstacle4.rect.height=40;
-        obstacle5.rect.x=1800;
-        obstacle5.rect.width=50;
-        obstacle5.rect.height=40;
-        obstacle6.rect.x=2000;
-        obstacle6.rect.width=50;
-        obstacle6.rect.height=40;
-        obstacle1.rect.y=350- obstacle1.rect.height;
-        obstacle2.rect.y=350- obstacle2.rect.height;
-        obstacle3.rect.y=350- obstacle3.rect.height;
-        obstacle4.rect.y=350- obstacle4.rect.height;
-        obstacle5.rect.y=350- obstacle5.rect.height;
-        obstacle6.rect.y=350- obstacle6.rect.height;
-        
-        lvl1.obstacles[0]=obstacle1;
-        lvl1.obstacles[1]=obstacle2;
-        lvl1.obstacles[2]=obstacle3;
-        lvl1.obstacles[3]=obstacle4;
-        lvl1.obstacles[4]=obstacle5;
-        lvl1.obstacles[5]=obstacle6;
-        lvl1.number_of_obstacle=6;
-        lvl1.number=1;
-        lvl1.avancee=0;
-        lvl1.longueur=2300;
-        
-        
-        for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
-        lvl1.obstacles[obstacle_counter].speed=1;
-        lvl1.obstacles[obstacle_counter].playerOn=false;
-    }
-        }
+    generateLevel(&lvl1,2);
     
 //-----------------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
@@ -128,7 +89,13 @@ int main(void)
         mousePosition = GetMousePosition();
         
         if(menu_state==0){
-            if(CheckCollisionPointRec(mousePosition,play) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) menu_state=1;
+            if(CheckCollisionPointRec(mousePosition,level1) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                menu_state=1; generateLevel(&lvl1,1);
+            }
+            if(CheckCollisionPointRec(mousePosition,level2) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ 
+            menu_state=1;
+            generateLevel(&lvl1,2);
+            }
         }
         
         if(menu_state==1){
@@ -141,6 +108,32 @@ int main(void)
             if(checkWin(&lvl1)==1)menu_state=3;
         }
         
+        if(menu_state==2){
+            if(CheckCollisionPointRec(mousePosition,playAgain) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                menu_state=1;
+                generateLevel(&lvl1,lvl1.number);
+            }
+        }
+        
+        if(menu_state==3){
+            if(CheckCollisionPointRec(mousePosition,ceNiveau) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                menu_state=1;
+                generateLevel(&lvl1,lvl1.number);
+            }
+            if(CheckCollisionPointRec(mousePosition,autreNiveau) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                menu_state=0;
+            }
+            if(CheckCollisionPointRec(mousePosition,ceNiveau){
+                sourisOn=1;
+            }
+            else if(CheckCollisionPointRec(mousePosition,autreNiveau){
+                sourisOn=2;
+            }
+            else{
+                sourisOn=0;
+            }
+        }
+        
         
         //----------------------------------------------------------------------------------
 
@@ -150,44 +143,54 @@ int main(void)
         //Menu entrée
         if(menu_state==0){
             ClearBackground(RAYWHITE);
-            DrawRectangleLinesEx(play,5,BLACK);
-            DrawText(TextFormat("PLAY"), 322,200,60, RED);
+            DrawText(TextFormat("Choose level" ), 240,100,50,RED);
+            DrawRectangleLinesEx(level1,5,BLACK);
+            DrawRectangleLinesEx(level2,5,BLACK);
+            DrawText(TextFormat("1"), 343,200,60,RED);
+            DrawText(TextFormat("2"), 433,200,60,RED);
         }
         
         else if(menu_state==1){
       
-            ClearBackground(RAYWHITE);
+            ClearBackground(lvl1.background_color);
             //if(colisionOrNot==0){
             //background
-            DrawTexture(backgroundH,100,100, WHITE);
          
             //ATH
-            DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50, RED);
+            DrawText(TextFormat("Run! %d %d %d",colisionOrNot,player.jumpState, player.state ), 250,40,50,lvl1.texte_color);
             
             //Player
             DrawCircle(player.position.x, player.position.y, player.taille, DARKBLUE);
             
             //Sol
-            DrawLine(0,350, screenWidth,350, BLACK);
+            DrawLine(0,350, screenWidth,350, lvl1.obstacle_color);
+            DrawRectangle(0,350,screenWidth,screenHeight,lvl1.obstacle_color);
             
             //Niveau
             for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
-                DrawRectangleRec(lvl1.obstacles[obstacle_counter].rect,BLACK);
+                DrawRectangleRec(lvl1.obstacles[obstacle_counter].rect,lvl1.obstacle_color);
                 }
             //Barre d'avancée
-             DrawRectangleLines(40,40,lvl1.longueur/10,20,BLACK);
-             DrawRectangle(40,40,lvl1.avancee/10,20,BLUE);
-            }
-        else if(menu_state==2){
+             DrawRectangleLines(40,40,lvl1.longueur/10,20,lvl1.texte_color);
+             DrawRectangle(40,40,lvl1.avancee/10,20,lvl1.texte_color);
+        }
+        else if(menu_state==2){ // Menu Game Over
             ClearBackground(RAYWHITE);
             DrawRectangleLinesEx(playAgain,5,BLACK);
             DrawText(TextFormat("GAME OVER"), 125,90,90, RED);
             DrawText(TextFormat("%.0f %%",lvl1.avancee/lvl1.longueur*100), 350,170,60, RED);
         }
         
-        else if(menu_state==3){
+        else if(menu_state==3){ //Menu niveau terminé
             ClearBackground(RAYWHITE);
-            DrawText(TextFormat("Bravo !"), 125,90,90, RED);
+            DrawText(TextFormat("Bravo!"), 250,90,90, RED);
+            DrawText(TextFormat("Rejouer ce niveau"), 90,230,20, RED);
+            DrawText(TextFormat("Rejouer sur un autre niveau"), 90,300,20, RED);
+            DrawRectangleLinesEx(ceNiveau,5,RAYWHITE);
+            DrawRectangleLinesEx(autreNiveau,5,RAYWHITE);
+            if(sourisOn==1){
+                
+            }
         }
         
      
@@ -292,4 +295,106 @@ int checkWin(Level * lvl){ //Vérifie si le joueur a terminer le niveau
     int win=0;
     if(lvl->longueur==lvl->avancee)win=1;
     return win;
+}
+
+void generateLevel(Level * lvl1,int numero){
+    int obstacle_counter;
+    Obstacle obstacle1;
+    Obstacle obstacle2;
+    Obstacle obstacle3;
+    Obstacle obstacle4;
+    Obstacle obstacle5;
+    Obstacle obstacle6; 
+    if(numero==1){ //choix niveau 1
+        obstacle1.rect.x=750;
+        obstacle1.rect.width=50;
+        obstacle1.rect.height=40;
+        obstacle2.rect.x=950;
+        obstacle2.rect.width=50;
+        obstacle2.rect.height=80;
+        obstacle3.rect.x=1200;
+        obstacle3.rect.width=50;
+        obstacle3.rect.height=40;
+        obstacle4.rect.x=1450;
+        obstacle4.rect.width=50;
+        obstacle4.rect.height=40;
+        obstacle5.rect.x=1800;
+        obstacle5.rect.width=50;
+        obstacle5.rect.height=40;
+        obstacle6.rect.x=2000;
+        obstacle6.rect.width=50;
+        obstacle6.rect.height=40;
+        obstacle1.rect.y=350- obstacle1.rect.height;
+        obstacle2.rect.y=350- obstacle2.rect.height;
+        obstacle3.rect.y=350- obstacle3.rect.height;
+        obstacle4.rect.y=350- obstacle4.rect.height;
+        obstacle5.rect.y=350- obstacle5.rect.height;
+        obstacle6.rect.y=350- obstacle6.rect.height;
+        
+        lvl1->obstacles[0]=obstacle1;
+        lvl1->obstacles[1]=obstacle2;
+        lvl1->obstacles[2]=obstacle3;
+        lvl1->obstacles[3]=obstacle4;
+        lvl1->obstacles[4]=obstacle5;
+        lvl1->obstacles[5]=obstacle6;
+        lvl1->number_of_obstacle=6;
+        lvl1->number=1;
+        lvl1->avancee=0;
+        lvl1->longueur=2300;
+        
+        for(obstacle_counter=0;obstacle_counter<lvl1->number_of_obstacle;obstacle_counter++){
+        lvl1->obstacles[obstacle_counter].speed=1;
+        lvl1->obstacles[obstacle_counter].playerOn=false;
+        }
+        
+        lvl1->background_color=WHITE;
+        lvl1->texte_color=RED;
+        lvl1->obstacle_color=GREEN;
+    }
+    else if(numero==2){ //choix niveau 2
+        obstacle1.rect.x=550;
+        obstacle1.rect.width=50;
+        obstacle1.rect.height=10;
+        obstacle2.rect.x=650;
+        obstacle2.rect.width=50;
+        obstacle2.rect.height=10;
+        obstacle3.rect.x=750;
+        obstacle3.rect.width=50;
+        obstacle3.rect.height=10;
+        obstacle4.rect.x=850;
+        obstacle4.rect.width=50;
+        obstacle4.rect.height=10;
+        obstacle5.rect.x=950;
+        obstacle5.rect.width=50;
+        obstacle5.rect.height=10;
+        obstacle6.rect.x=1100;
+        obstacle6.rect.width=50;
+        obstacle6.rect.height=10;
+        obstacle1.rect.y=350- obstacle1.rect.height;
+        obstacle2.rect.y=330- obstacle2.rect.height;
+        obstacle3.rect.y=310- obstacle3.rect.height;
+        obstacle4.rect.y=290- obstacle4.rect.height;
+        obstacle5.rect.y=270- obstacle5.rect.height;
+        obstacle6.rect.y=250- obstacle6.rect.height;
+        
+        lvl1->obstacles[0]=obstacle1;
+        lvl1->obstacles[1]=obstacle2;
+        lvl1->obstacles[2]=obstacle3;
+        lvl1->obstacles[3]=obstacle4;
+        lvl1->obstacles[4]=obstacle5;
+        lvl1->obstacles[5]=obstacle6;
+        lvl1->number_of_obstacle=6;
+        lvl1->number=2;
+        lvl1->avancee=0;
+        lvl1->longueur=100;
+        
+        for(obstacle_counter=0;obstacle_counter<lvl1->number_of_obstacle;obstacle_counter++){
+        lvl1->obstacles[obstacle_counter].speed=1;
+        lvl1->obstacles[obstacle_counter].playerOn=false;
+        }
+        
+        lvl1->background_color=BLACK;
+        lvl1->texte_color=YELLOW;
+        lvl1->obstacle_color=YELLOW;
+    }
 }
