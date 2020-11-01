@@ -23,6 +23,7 @@
         float longueur;
     } Level;
    
+    
 
 int main(void)
 {
@@ -43,62 +44,6 @@ int main(void)
     const int screenHeight = 450;
     
     Player player;
-    //Niveau 1
-    Level lvl1;
-    Obstacle obstacle1;
-    Obstacle obstacle2;
-    Obstacle obstacle3;
-    Obstacle obstacle4;
-    Obstacle obstacle5;
-    Obstacle obstacle6;
-    
-    
-    obstacle1.rect.x=750;
-    obstacle1.rect.width=50;
-    obstacle1.rect.height=40;
-    obstacle2.rect.x=950;
-    obstacle2.rect.width=50;
-    obstacle2.rect.height=80;
-    obstacle3.rect.x=1200;
-    obstacle3.rect.width=50;
-    obstacle3.rect.height=40;
-    obstacle4.rect.x=1450;
-    obstacle4.rect.width=50;
-    obstacle4.rect.height=40;
-    obstacle5.rect.x=1800;
-    obstacle5.rect.width=50;
-    obstacle5.rect.height=40;
-    obstacle6.rect.x=2000;
-    obstacle6.rect.width=50;
-    obstacle6.rect.height=40;
-    obstacle1.rect.y=350- obstacle1.rect.height;
-    obstacle2.rect.y=350- obstacle2.rect.height;
-    obstacle3.rect.y=350- obstacle3.rect.height;
-    obstacle4.rect.y=350- obstacle4.rect.height;
-    obstacle5.rect.y=350- obstacle5.rect.height;
-    obstacle6.rect.y=350- obstacle6.rect.height;
-    
-    lvl1.obstacles[0]=obstacle1;
-    lvl1.obstacles[1]=obstacle2;
-    lvl1.obstacles[2]=obstacle3;
-    lvl1.obstacles[3]=obstacle4;
-    lvl1.obstacles[4]=obstacle5;
-    lvl1.obstacles[5]=obstacle6;
-    lvl1.number_of_obstacle=6;
-    lvl1.number=1;
-    lvl1.avancee=0;
-    lvl1.longueur=2300;
-    
-    
-    for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
-    lvl1.obstacles[obstacle_counter].speed=1;
-    lvl1.obstacles[obstacle_counter].playerOn=false;
-    }
-    //Menu demarrer
-    
-    Rectangle play={screenWidth/2-100,screenHeight/2-40,200,80};
-    
-    
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
     bool pause=true;
@@ -107,12 +52,69 @@ int main(void)
     player.state=0;
     int colisionOrNot=0;
     
+    
+    //Menu demarrer
+    Rectangle play={screenWidth/2-100,screenHeight/2-40,200,80};
+    
+    
     //menu GAME OVER
     Rectangle playAgain={screenWidth/2-100,screenHeight/2+20,200,80};
     
     
+    //CHoix du level ----------------------------------------------------------------------
+    Level lvl1;
+    int level_numero=1;
+    Obstacle obstacle1;
+    Obstacle obstacle2;
+    Obstacle obstacle3;
+    Obstacle obstacle4;
+    Obstacle obstacle5;
+    Obstacle obstacle6; 
+    if(level_numero=1){
+        obstacle1.rect.x=750;
+        obstacle1.rect.width=50;
+        obstacle1.rect.height=40;
+        obstacle2.rect.x=950;
+        obstacle2.rect.width=50;
+        obstacle2.rect.height=80;
+        obstacle3.rect.x=1200;
+        obstacle3.rect.width=50;
+        obstacle3.rect.height=40;
+        obstacle4.rect.x=1450;
+        obstacle4.rect.width=50;
+        obstacle4.rect.height=40;
+        obstacle5.rect.x=1800;
+        obstacle5.rect.width=50;
+        obstacle5.rect.height=40;
+        obstacle6.rect.x=2000;
+        obstacle6.rect.width=50;
+        obstacle6.rect.height=40;
+        obstacle1.rect.y=350- obstacle1.rect.height;
+        obstacle2.rect.y=350- obstacle2.rect.height;
+        obstacle3.rect.y=350- obstacle3.rect.height;
+        obstacle4.rect.y=350- obstacle4.rect.height;
+        obstacle5.rect.y=350- obstacle5.rect.height;
+        obstacle6.rect.y=350- obstacle6.rect.height;
+        
+        lvl1.obstacles[0]=obstacle1;
+        lvl1.obstacles[1]=obstacle2;
+        lvl1.obstacles[2]=obstacle3;
+        lvl1.obstacles[3]=obstacle4;
+        lvl1.obstacles[4]=obstacle5;
+        lvl1.obstacles[5]=obstacle6;
+        lvl1.number_of_obstacle=6;
+        lvl1.number=1;
+        lvl1.avancee=0;
+        lvl1.longueur=2300;
+        
+        
+        for(obstacle_counter=0;obstacle_counter<lvl1.number_of_obstacle;obstacle_counter++){
+        lvl1.obstacles[obstacle_counter].speed=1;
+        lvl1.obstacles[obstacle_counter].playerOn=false;
+    }
+        }
     
-
+//-----------------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -199,11 +201,12 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     return 0;
+
 }
 
 
 
-void gameRun(Level * lvl){
+void gameRun(Level * lvl){ //Fait avancer les obstacles et la progression du joueur dans le niveau
     int obstacle_counter;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
     lvl->obstacles[obstacle_counter].rect.x =lvl->obstacles[obstacle_counter].rect.x-2*lvl->obstacles[obstacle_counter].speed;
@@ -211,7 +214,7 @@ void gameRun(Level * lvl){
     lvl->avancee+=2;
 }
 
-void jump(Player * player){
+void jump(Player * player){ //Gère le saut du joueur 
     switch (player->jumpState){
         case 0 :
             if(IsKeyDown(KEY_SPACE)){
@@ -260,7 +263,7 @@ int colision(Player * player,Level * lvl){ //J'ai créer cette fonction en pensa
     
 }
 
-void surObstacle(Player * player, Level * lvl){
+void surObstacle(Player * player, Level * lvl){ //Gère le fait que le joueur se trouve sur un obstacle
     int obstacle_counter;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
         if(player->position.y+player->taille == lvl->obstacles[obstacle_counter].rect.y &&
@@ -285,7 +288,7 @@ void surObstacle(Player * player, Level * lvl){
     }
 }
 
-int checkWin(Level * lvl){
+int checkWin(Level * lvl){ //Vérifie si le joueur a terminer le niveau
     int win=0;
     if(lvl->longueur==lvl->avancee)win=1;
     return win;
