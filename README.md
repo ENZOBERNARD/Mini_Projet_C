@@ -38,6 +38,14 @@ Création de meilleurs niveau plus interessant a jouer pour le joueur (autre que
 
 # Fichiers du projet
 
-L'ensemble du code source se trouve dans le fichier main.c
+L'ensemble du code source se trouve dans le fichier main.c qui utilise geo.h (qui utilise raylib.h).
+
+# Vidéo de présentation
+
+Une courte vidéo est disponible dans le projet : enzo-bernard.mp4 afin d'expliquer le but et le fonctionnement du projet.
+
+
+
+Enzo BERNARD
 
 
