@@ -1,6 +1,6 @@
 #include "raylib.h"
 
-   typedef struct Player {
+   typedef struct Player { //structure du joueur 
     Vector2 position;
     int taille;
     float speed;
@@ -10,13 +10,13 @@
     Color couleur;
     } Player;
     
-    typedef struct Obstacle {
+    typedef struct Obstacle { //structure d'un obstacle
     Rectangle rect;
     float speed;
     bool playerOn;
     } Obstacle;
     
-    typedef struct Level {
+    typedef struct Level { //structure d'un niveau qui est un ensemble d'obstacle
         Obstacle obstacles[40];
         int number_of_obstacle;
         int number;
@@ -34,20 +34,15 @@ int main(void)
     // Initialization
     //--------------------------------------------------------------------------------------
     int menu_state=0; //0:Menu demarrage 1:Run 2:GAME OVER 3:Win 4:choix skin
-    int obstacle_counter;
-    Vector2 mousePosition = { 0 };
     
+    int obstacle_counter; //POur compter les obstzcles dans une boucle for
     
-    Image image_fondH=LoadImage("background_haut.png");
-    Texture2D backgroundH = LoadTextureFromImage(image_fondH);  
-    UnloadImage(image_fondH); 
-    float scrollingB = 0.0f;
-    float scrollingH = 0.0f;
+    Vector2 mousePosition = { 0 }; // vecteur position de la souris
     
-    const int screenWidth = 800;
+    const int screenWidth = 800; 
     const int screenHeight = 450;
     
-    Player player;
+    Player player; //initialisation des variables de player
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
     bool pause=false;
@@ -93,7 +88,7 @@ int main(void)
     
     //CHoix du level ----------------------------------------------------------------------
     Level lvl1;
-    generateLevel(&lvl1,2);
+    generateLevel(&lvl1,2); //generation du niveau
     
 //-----------------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
@@ -109,6 +104,7 @@ int main(void)
         mousePosition = GetMousePosition();
         
         if(menu_state==0){ //menu choix du niveau
+        //on regarde si il y a collision pour les animations et on check si il y a click pour changer de menu
             if(CheckCollisionPointRec(mousePosition,level1) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 menu_state=1; generateLevel(&lvl1,1);
             }
@@ -134,14 +130,14 @@ int main(void)
         }
         
         if(menu_state==1){ //en jeu
-            if (IsKeyPressed(KEY_ENTER)) pause = !pause;
+            if (IsKeyPressed(KEY_ENTER)) pause = !pause; //appuyer sur ENTREE pour faire pause
             if(pause==false){
                 if (pause==false)gameRun(&lvl1);
-                surObstacle(&player, &lvl1);
-                jump(&player);
-                colisionOrNot=colision(&player,&lvl1);
-                if(colisionOrNot==1)menu_state=2;
-                if(checkWin(&lvl1)==1)menu_state=3;
+                surObstacle(&player, &lvl1); //les obstacles avance
+                jump(&player); //le player peut sauter
+                colisionOrNot=colision(&player,&lvl1); .//check des collisions
+                if(colisionOrNot==1)menu_state=2; //Si collision GAME OVER
+                if(checkWin(&lvl1)==1)menu_state=3; //check si le joueur a fini le niveau si oui, menu fin du niveau
             }
             else{
                 if(CheckCollisionPointRec(mousePosition,reprendre) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
@@ -201,7 +197,7 @@ int main(void)
             }
         }
         
-        if(menu_state==4){
+        if(menu_state==4){//Menu pour changer la couleur du player
              if(CheckCollisionPointRec(mousePosition,Bleu) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
                 player.couleur=BLUE;
                 menu_state=0;
@@ -261,7 +257,7 @@ int main(void)
         if(menu_state==0){ //choix niveau
             ClearBackground(RAYWHITE);
             DrawText(TextFormat("Choose level" ), 240,100,50,RED);
-            if(sourisOn==1){
+            if(sourisOn==1){ //animation si passage d ela souris
                 DrawRectangleRec(level1,GRAY);
             }
             if(sourisOn==2){
@@ -390,7 +386,7 @@ int main(void)
 
 void gameRun(Level * lvl){ //Fait avancer les obstacles et la progression du joueur dans le niveau
     int obstacle_counter;
-    for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
+    for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){ //fait avancer les obstacles d el'ensemble du niveau
     lvl->obstacles[obstacle_counter].rect.x =lvl->obstacles[obstacle_counter].rect.x-2*lvl->obstacles[obstacle_counter].speed;
     }
     lvl->avancee+=2;
@@ -398,13 +394,13 @@ void gameRun(Level * lvl){ //Fait avancer les obstacles et la progression du jou
 
 void jump(Player * player){ //Gère le saut du joueur 
     switch (player->jumpState){
-        case 0 :
+        case 0 ://le joueur est au sol
             if(IsKeyDown(KEY_SPACE)){
                 player->jumpState=1;
                 player->state=1;
             }
             break;
-        case 1 :
+        case 1 ://le joueur est entrain de monter
             if(player->jumpFrame<=20){
                 player->position.y -=5;
                 player->jumpFrame++;
@@ -414,12 +410,12 @@ void jump(Player * player){ //Gère le saut du joueur
                 player->state=2;
             }
             break;
-        case 2:
-            if(player->position.y<320){
+        case 2://le joueur est entrain de retomber
+            if(player->position.y<320){//Le joueur encore dans les airs
                 player->position.y +=5;
                 player->jumpFrame++;
             }
-            else{
+            else{ //Le joueur est au sol
                 player->jumpState=0;
                 player->jumpFrame=0;
                 player->state=0;
