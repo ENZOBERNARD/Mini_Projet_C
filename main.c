@@ -1,32 +1,6 @@
-#include "raylib.h"
 
-   typedef struct Player { //structure du joueur 
-    Vector2 position;
-    int taille;
-    float speed;
-    int state; //0:sur le sol 1:Saute 2:tombe 3:Sur un obstacle
-    int jumpState;
-    int jumpFrame;
-    Color couleur;
-    } Player;
-    
-    typedef struct Obstacle { //structure d'un obstacle
-    Rectangle rect;
-    float speed;
-    bool playerOn;
-    } Obstacle;
-    
-    typedef struct Level { //structure d'un niveau qui est un ensemble d'obstacle
-        Obstacle obstacles[40];
-        int number_of_obstacle;
-        int number;
-        float avancee;
-        float longueur;
-        Color obstacle_color;
-        Color background_color;
-        Color texte_color;
-        char * name;
-    } Level;
+#include "geo.h"
+
    
 
 int main(void)
@@ -42,6 +16,8 @@ int main(void)
     const int screenWidth = 800; 
     const int screenHeight = 450;
     
+    int collisionOrNot=0;
+    
     Player player; //initialisation des variables de player
     player.position = (Vector2){(float)100, (float)320};
     player.taille=30;
@@ -50,7 +26,6 @@ int main(void)
     player.jumpFrame=0;
     player.state=0;
     player.couleur=BLUE;
-    int colisionOrNot=0;
     
     //Menu Pause
     Rectangle reprendre={screenWidth/2-100,180,200,50};
@@ -79,12 +54,6 @@ int main(void)
     Rectangle Orange={125,250,150,150};
     Rectangle Jaune={325,250,150,150};
     Rectangle Vert={525,250,150,150};
-    Rectangle bBleu={125,175,150,25};
-    Rectangle bViolet={325,50,150,150};
-    Rectangle bRose={525,50,150,150};
-    Rectangle bOrange={125,250,150,150};
-    Rectangle bJaune={325,250,150,150};
-    Rectangle bVert={525,250,150,150};
     
     //CHoix du level ----------------------------------------------------------------------
     Level lvl1;
@@ -135,8 +104,8 @@ int main(void)
                 if (pause==false)gameRun(&lvl1);
                 surObstacle(&player, &lvl1); //les obstacles avance
                 jump(&player); //le player peut sauter
-                colisionOrNot=colision(&player,&lvl1); .//check des collisions
-                if(colisionOrNot==1)menu_state=2; //Si collision GAME OVER
+                collisionOrNot=collision(&player,&lvl1); //check des collisions
+                if(collisionOrNot==1)menu_state=2; //Si collision GAME OVER
                 if(checkWin(&lvl1)==1)menu_state=3; //check si le joueur a fini le niveau si oui, menu fin du niveau
             }
             else{
@@ -424,7 +393,7 @@ void jump(Player * player){ //Gère le saut du joueur
     }
 }
 
-int colision(Player * player,Level * lvl){ //J'ai créer cette fonction en pensant que raylib n'avait pas de fonction gérant les collisions
+int collision(Player * player,Level * lvl){ //J'ai créer cette fonction en pensant que raylib n'avait pas de fonction gérant les collisions
     int obstacle_counter;
     int retour=0;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
@@ -472,7 +441,7 @@ int checkWin(Level * lvl){ //Vérifie si le joueur a terminer le niveau
     return win;
 }
 
-void generateLevel(Level * lvl1,int numero){
+void generateLevel(Level * lvl1,int numero){ 
     int obstacle_counter;
     Obstacle obstacle1;
     Obstacle obstacle2;
