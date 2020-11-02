@@ -9,7 +9,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     int menu_state=0; //0:Menu demarrage 1:Run 2:GAME OVER 3:Win 4:choix skin
     
-    int obstacle_counter; //POur compter les obstzcles dans une boucle for
+    int obstacle_counter; //POur compter les obstacles dans une boucle for
     
     Vector2 mousePosition = { 0 }; // vecteur position de la souris
     
