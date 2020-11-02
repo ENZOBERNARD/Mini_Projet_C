@@ -5,35 +5,35 @@ Il s'agit d'un jeu 2D où un carré avance (sans arrêt) de gauche à droite et 
 
 Un seul objectif : Finir tous les niveaux !!
 
-# Commande: 
+# Commandes: 
 
 Sauter  [Barre Espace]
 Pause [Entrée]
 
-# Caractéristique
+# Caractéristiques
 
 Niveau :
-Il existe acutellement 2 niveaux. Les niveaux peuvent facilement être créer grâce a la fonction generateLevel().
-Les collisisons avec les obstacles fonctionnent bien : Lorsque le joueur rentre dans un obstacle il perd. Et lorsque le joueur est sur un obstacle cela n'est pas considéré comme game over mais comme un plateforme.
+Il existe actuellement 2 niveaux. Les niveaux peuvent facilement être créé grâce à la fonction generateLevel().
+Les collisisons avec les obstacles fonctionnent bien : Lorsque le joueur rentre dans un obstacle, il perd. Et lorsque le joueur est sur un obstacle cela n'est pas considéré comme game over, mais comme une plateforme.
 
 Customisation et couleur :
-Il y a possibilité de changer la couleur du joueur. Chaque niveau possède ses propres couleurs, afin que chaque niveau ait un "univers" différent.
+Il y a possibilité de changer la couleur du joueur. Chaque niveaux possèdent ses propres couleurs, afin qu'ils aient chacuns un "univers" différent.
 
 Barre de progression :
-Une barre de progression est diponible lors de la partie et lorsque le joueur perd il peut voir son avancée dans le niveau.
+Une barre de progression est diponible lors de la partie et lorsque le joueur perd, il peut voir son avancée dans le niveau.
 
-# Perpectives d'amléiorations
+# Perpectives d'améliorations
 
 Niveau: 
-On peut tout d'abord ajouter et créer plusieurs niveaux, avec de plus belles couleurs, des diffultés différentes selon les niveaux.
+On peut tout d'abord ajouter et créer plusieurs niveaux, avec de plus belles couleurs et des diffultés différentes selon les niveaux.
 
 Customisation :
-Ajouter des textures au jeu afin qu'il soit plus beau esthétiquement. Des animations aussi comme par exmemple lors d'un game over ou le lancement d'un niveau.
+Ajouter des textures au jeu afin qu'il soit plus beau ainsi que des animations, comme par exmemple lors d'un game over ou le lancement d'un niveau.
 
 Jouabilité :
 Optimiser le temps de saut, la hauteur.
 Optimiser aussi la vitesse des obstacles.
-Création de meilleurs niveau plus interessant a jouer pour le joueur (autre que de simples tests).
+Ajout de niveaux 
 
 
 # Fichiers du projet
