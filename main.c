@@ -102,7 +102,7 @@ int main(void)
             if (IsKeyPressed(KEY_ENTER)) pause = !pause; //appuyer sur ENTREE pour faire pause
             if(pause==false){
                 if (pause==false)gameRun(&lvl1);
-                surObstacle(&player, &lvl1); //les obstacles avance
+                surObstacle(&player, &lvl1); //les obstacles avancent
                 jump(&player); //le player peut sauter
                 collisionOrNot=collision(&player,&lvl1); //check des collisions
                 if(collisionOrNot==1)menu_state=2; //Si collision GAME OVER
@@ -226,7 +226,7 @@ int main(void)
         if(menu_state==0){ //choix niveau
             ClearBackground(RAYWHITE);
             DrawText(TextFormat("Choose level" ), 240,100,50,RED);
-            if(sourisOn==1){ //animation si passage d ela souris
+            if(sourisOn==1){ //animation si passage de la souris
                 DrawRectangleRec(level1,GRAY);
             }
             if(sourisOn==2){
@@ -355,7 +355,7 @@ int main(void)
 
 void gameRun(Level * lvl){ //Fait avancer les obstacles et la progression du joueur dans le niveau
     int obstacle_counter;
-    for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){ //fait avancer les obstacles d el'ensemble du niveau
+    for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){ //fait avancer les obstacles de l'ensemble du niveau
     lvl->obstacles[obstacle_counter].rect.x =lvl->obstacles[obstacle_counter].rect.x-2*lvl->obstacles[obstacle_counter].speed;
     }
     lvl->avancee+=2;
@@ -369,7 +369,7 @@ void jump(Player * player){ //Gère le saut du joueur
                 player->state=1;
             }
             break;
-        case 1 ://le joueur est entrain de monter
+        case 1 ://le joueur est en train de monter
             if(player->jumpFrame<=20){
                 player->position.y -=5;
                 player->jumpFrame++;
@@ -379,8 +379,8 @@ void jump(Player * player){ //Gère le saut du joueur
                 player->state=2;
             }
             break;
-        case 2://le joueur est entrain de retomber
-            if(player->position.y<320){//Le joueur encore dans les airs
+        case 2://le joueur est en train de retomber
+            if(player->position.y<320){//Le joueur est encore dans les airs
                 player->position.y +=5;
                 player->jumpFrame++;
             }
@@ -393,7 +393,7 @@ void jump(Player * player){ //Gère le saut du joueur
     }
 }
 
-int collision(Player * player,Level * lvl){ //J'ai créer cette fonction en pensant que raylib n'avait pas de fonction gérant les collisions
+int collision(Player * player,Level * lvl){ //J'ai crée cette fonction en pensant que raylib n'avait pas de fonction gérant les collisions
     int obstacle_counter;
     int retour=0;
     for(obstacle_counter=0;obstacle_counter<lvl->number_of_obstacle;obstacle_counter++){
@@ -435,7 +435,7 @@ void surObstacle(Player * player, Level * lvl){ //Gère le fait que le joueur se
     }
 }
 
-int checkWin(Level * lvl){ //Vérifie si le joueur a terminer le niveau
+int checkWin(Level * lvl){ //Vérifie si le joueur a terminé le niveau
     int win=0;
     if(lvl->longueur==lvl->avancee)win=1;
     return win;
